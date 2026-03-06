@@ -37,7 +37,7 @@ module.exports = grammar({
 
     device_property: $ => seq(
       'port',
-      $.string,
+      $.port_value,
     ),
 
     // ── instrument ──
@@ -275,7 +275,7 @@ module.exports = grammar({
     ),
 
     // ── include ──
-    include_stmt: $ => seq('include', $.string),
+    include_stmt: $ => seq('include', $.include_path),
 
     // ── tempo (top-level) ──
     tempo_stmt: $ => seq('tempo', $.number),
@@ -300,7 +300,10 @@ module.exports = grammar({
     note_name: $ => token(prec(1, /[a-g][#b]?/)),
     number: $ => /\d+/,
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
-    string: $ => /"[^"]*"/,
+    // port_value: port name including spaces, up to newline or '}'
+    port_value: $ => token(prec(-1, /[^\n}]+/)),
+    // include_path: file path (no spaces)
+    include_path: $ => /\S+/,
     comment: $ => /\/\/.*/,
   },
 });
