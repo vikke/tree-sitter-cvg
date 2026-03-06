@@ -17,8 +17,10 @@ tempo 125
 scale c minor
 
 device my_synth {
-  port "IAC Driver"
+  port IAC Driver
 }
+
+include ./setup.cvg
 
 instrument bass {
   device my_synth
