@@ -124,9 +124,18 @@ module.exports = grammar({
     _clip_content: $ => choice(
       $.use_stmt,
       $.resolution_stmt,
+      $.dash_divider,
       $.drum_line,
       $.melody_line,
     ),
+
+    // ── dash divider (`---`) ──
+    // Exactly three hyphens. Separates parallel layers within a clip body.
+    // Higher precedence than `step_pattern` so a bare `---` is not
+    // misinterpreted as a drum step pattern. Hyphens are no longer part of
+    // `step_pattern` (see below), so 4+ hyphens become a parse ERROR which
+    // matches the lcvgc engine's strict-3-hyphens specification.
+    dash_divider: $ => token(prec(1, '---')),
 
     use_stmt: $ => seq('use', field('kit', $.identifier)),
     resolution_stmt: $ => seq('resolution', $.number),
@@ -138,8 +147,10 @@ module.exports = grammar({
       $.step_pattern,
     )),
 
-    // Step pattern: contiguous string of step characters (no whitespace)
-    step_pattern: $ => token(prec(-1, /[xXo.|\-()>*0-9]+/)),
+    // Step pattern: contiguous string of step characters (no whitespace).
+    // Note: hyphens are NOT part of step_pattern. They are reserved for the
+    // `---` dash_divider token (parallel layer separator).
+    step_pattern: $ => token(prec(-1, /[xXo.|()>*0-9]+/)),
 
     // ── melody line ──
     melody_line: $ => prec.right(seq(
@@ -160,9 +171,24 @@ module.exports = grammar({
 
     pitched_note: $ => seq(
       $.note_name,
-      optional(seq(':', $.octave)),
-      optional(seq(':', $.duration)),
+      optional($._oct_dur_suffix),
       optional($.articulation),
+    ),
+
+    // オクターブ・音価の後置サフィックス。 lcvgc 仕様 §7 で定義される 4 形式:
+    //   `:N:D`   (octave + duration)        例: c:3:8
+    //   `:N`     (octave のみ)              例: c:3
+    //   `::D`    (octave 省略, duration)    例: f::4
+    //   (なし)   (両方引継ぎ)                例: c
+    //
+    // The trailing octave/duration suffix on a pitched note. Modeled as a
+    // single rule so the parser can disambiguate `c:4:1` (octave=4,
+    // duration=1) from `c:8` (octave=8 — a parse error in semantic terms,
+    // but legal in the grammar) without GLR ambiguity.
+    _oct_dur_suffix: $ => choice(
+      seq(':', $.octave, ':', $.duration),
+      seq(':', $.octave),
+      seq('::', $.duration),
     ),
 
     rest: $ => seq('r', optional(seq(':', $.duration))),
@@ -180,19 +206,32 @@ module.exports = grammar({
       '[',
       repeat1(choice($.note_name, $.rest)),
       ']',
-      optional(seq(':', $.octave)),
-      optional(seq(':', $.duration)),
+      optional($._oct_dur_suffix),
       optional($.arp_expr),
     ),
 
     chord_name: $ => seq(
       $.chord_symbol,
-      optional(seq(':', $.octave)),
-      optional(seq(':', $.duration)),
+      optional($._oct_dur_suffix),
       optional($.arp_expr),
     ),
 
-    chord_symbol: $ => token(prec(2, /[a-g][#b]?(?:maj7|m7|7|dim7|aug|m|dim|sus[24]|add9|6|9|11|13)/)),
+    // コードネーム: 音名 (オプショナルな # / b) + サフィックス。
+    // lcvgc 仕様 §7.6 の全サフィックスを長い順から並べる (最長一致のため):
+    //   M7#5, m7b5, mM7, m13, m11, m9, m7, m6, M7, Maj, sus4, sus2, dim7,
+    //   maj7, add9, aug, dim, 13, 11, m, 9, 7, 6
+    // (`6` `7` `9` 等の単独数字サフィックスは最後)
+    //
+    // Chord symbol token: note name (optional sharp/flat) followed by a
+    // chord-quality suffix. Suffixes are listed longest-first to ensure the
+    // regex prefers `mM7` over `m`, `m7` over `m`, `m13` over `m`, etc.
+    chord_symbol: $ =>
+      token(
+        prec(
+          2,
+          /[a-g][#b]?(?:M7#5|m7b5|mM7|maj7|sus4|sus2|dim7|add9|m13|m11|M7|Maj|aug|dim|m9|m7|m6|13|11|m|9|7|6)/,
+        ),
+      ),
 
     arp_expr: $ => seq(
       'arp',

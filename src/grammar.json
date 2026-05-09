@@ -534,6 +534,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "dash_divider"
+        },
+        {
+          "type": "SYMBOL",
           "name": "drum_line"
         },
         {
@@ -541,6 +545,17 @@
           "name": "melody_line"
         }
       ]
+    },
+    "dash_divider": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "STRING",
+          "value": "---"
+        }
+      }
     },
     "use_stmt": {
       "type": "SEQ",
@@ -600,7 +615,7 @@
         "value": -1,
         "content": {
           "type": "PATTERN",
-          "value": "[xXo.|\\-()>*0-9]+"
+          "value": "[xXo.|()>*0-9]+"
         }
       }
     },
@@ -681,38 +696,8 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": ":"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "octave"
-                }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": ":"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "duration"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "_oct_dur_suffix"
             },
             {
               "type": "BLANK"
@@ -728,6 +713,58 @@
             },
             {
               "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "_oct_dur_suffix": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": ":"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "octave"
+            },
+            {
+              "type": "STRING",
+              "value": ":"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "duration"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": ":"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "octave"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "::"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "duration"
             }
           ]
         }
@@ -857,38 +894,8 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": ":"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "octave"
-                }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": ":"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "duration"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "_oct_dur_suffix"
             },
             {
               "type": "BLANK"
@@ -920,38 +927,8 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": ":"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "octave"
-                }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": ":"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "duration"
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "_oct_dur_suffix"
             },
             {
               "type": "BLANK"
@@ -979,7 +956,7 @@
         "value": 2,
         "content": {
           "type": "PATTERN",
-          "value": "[a-g][#b]?(?:maj7|m7|7|dim7|aug|m|dim|sus[24]|add9|6|9|11|13)"
+          "value": "[a-g][#b]?(?:M7#5|m7b5|mM7|maj7|sus4|sus2|dim7|add9|m13|m11|M7|Maj|aug|dim|m9|m7|m6|13|11|m|9|7|6)"
         }
       }
     },
