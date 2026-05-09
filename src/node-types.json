@@ -150,6 +150,10 @@
           "named": true
         },
         {
+          "type": "dash_divider",
+          "named": true
+        },
+        {
           "type": "drum_line",
           "named": true
         },
@@ -945,6 +949,10 @@
     "named": false
   },
   {
+    "type": "::",
+    "named": false
+  },
+  {
     "type": ">",
     "named": false
   },
@@ -982,6 +990,10 @@
   },
   {
     "type": "comment",
+    "named": true
+  },
+  {
+    "type": "dash_divider",
     "named": true
   },
   {

@@ -39,6 +39,9 @@
 ;; ステップシーケンサーパターン (x.oX|)
 (step_pattern) @string
 
+;; 並列レイヤー分離 (---)
+(dash_divider) @keyword.separator
+
 ;; scene内の確率
 (scene_slot (probability) @number.special)
 
