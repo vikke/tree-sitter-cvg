@@ -1,0 +1,87 @@
+================================================================================
+Dash divider in pitched clip body (3 hyphens)
+================================================================================
+
+clip layered [bars 1] {
+  chord c:4:1
+  ---
+  chord g:4:1
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (clip_def
+    name: (identifier)
+    (clip_header
+      (bars_attr
+        (number)))
+    (melody_line
+      instrument: (identifier)
+      (pitched_note
+        (note_name)
+        (octave)
+        (duration)))
+    (dash_divider)
+    (melody_line
+      instrument: (identifier)
+      (pitched_note
+        (note_name)
+        (octave)
+        (duration)))))
+
+================================================================================
+Dash divider in drum clip body (no-op, but parses cleanly)
+================================================================================
+
+clip beat [bars 1] {
+  use tr808
+  resolution 16
+  bd    x...x...x...x...
+  ---
+  snare ....x.......x...
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (clip_def
+    name: (identifier)
+    (clip_header
+      (bars_attr
+        (number)))
+    (use_stmt
+      kit: (identifier))
+    (resolution_stmt
+      (number))
+    (drum_line
+      instrument: (identifier)
+      (step_pattern))
+    (dash_divider)
+    (drum_line
+      instrument: (identifier)
+      (step_pattern))))
+
+================================================================================
+Two hyphens are NOT a dash divider
+================================================================================
+
+:error
+
+clip bad [bars 1] {
+  chord c:4:1
+  --
+  chord g:4:1
+}
+
+================================================================================
+Four hyphens are NOT a dash divider
+================================================================================
+
+:error
+
+clip bad [bars 1] {
+  chord c:4:1
+  ----
+  chord g:4:1
+}
