@@ -1,0 +1,298 @@
+================================================================================
+Global scale with single token c_major
+================================================================================
+
+scale c_major
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (scale_stmt
+    (note_name)
+    (scale_type)))
+
+================================================================================
+Global scale with s-sharp root cs_minor
+================================================================================
+
+scale cs_minor
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (scale_stmt
+    (note_name)
+    (scale_type)))
+
+================================================================================
+Global scale with hash-sharp root c#_minor
+================================================================================
+
+scale c#_minor
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (scale_stmt
+    (note_name)
+    (scale_type)))
+
+================================================================================
+Global scale with flat root and multi-word type
+================================================================================
+
+scale eb_harmonic_minor
+scale fs_melodic_minor
+scale b_mixolydian
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (scale_stmt
+    (note_name)
+    (scale_type))
+  (scale_stmt
+    (note_name)
+    (scale_type))
+  (scale_stmt
+    (note_name)
+    (scale_type)))
+
+================================================================================
+Clip header scale attribute d_dorian
+================================================================================
+
+clip x [scale d_dorian] {
+  bass d:3:8
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (clip_def
+    name: (identifier)
+    (clip_header
+      (scale_attr
+        (note_name)
+        (scale_type)))
+    (melody_line
+      instrument: (identifier)
+      (pitched_note
+        (note_name)
+        (octave)
+        (duration)))))
+
+================================================================================
+Old two-token scale form is an error
+================================================================================
+
+scale c major
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (ERROR
+    (note_name)
+    (identifier)))
+
+================================================================================
+Unknown scale type suffix is an error
+================================================================================
+
+scale c_harmonic
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (ERROR
+    (note_name)
+    (identifier)))
+
+================================================================================
+Scale type with trailing garbage is an error
+================================================================================
+
+scale c_majorx
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (ERROR
+    (note_name)
+    (identifier)))
+
+================================================================================
+Whitespace after underscore is an error
+================================================================================
+
+scale c_ major
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (ERROR
+    (note_name)
+    (identifier)
+    (scale_type)))
+
+================================================================================
+Whitespace before underscore is an error
+================================================================================
+
+scale c _major
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (ERROR
+    (note_name)
+    (identifier)))
+
+================================================================================
+es is not a sharp alias in scale root
+================================================================================
+
+scale es_major
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (ERROR
+    (note_name)
+    (identifier)))
+
+================================================================================
+Old two-token scale form in clip header is an error
+================================================================================
+
+clip x [scale c major] {
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (clip_def
+    name: (identifier)
+    (ERROR
+      (note_name)
+      (identifier))))
+
+================================================================================
+Melody notes with s-sharp alias
+================================================================================
+
+clip x {
+  bass cs:3:8 ds:3 fs gs::4 as:2:16
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (clip_def
+    name: (identifier)
+    (melody_line
+      instrument: (identifier)
+      (pitched_note
+        (note_name)
+        (octave)
+        (duration))
+      (pitched_note
+        (note_name)
+        (octave))
+      (pitched_note
+        (note_name))
+      (pitched_note
+        (note_name)
+        (duration))
+      (pitched_note
+        (note_name)
+        (octave)
+        (duration)))))
+
+================================================================================
+Chord bracket with s-sharp alias
+================================================================================
+
+clip x {
+  pad [cs fs gs]:3:1
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (clip_def
+    name: (identifier)
+    (melody_line
+      instrument: (identifier)
+      (chord
+        (note_name)
+        (note_name)
+        (note_name)
+        (octave)
+        (duration)))))
+
+================================================================================
+Chord names with s-sharp root and sus disambiguation
+================================================================================
+
+clip x {
+  pad csm7:3:1 csus4:3:1 cssus4:3:1 c#sus4 dsus2 fsus4 gsus2 asus4
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (clip_def
+    name: (identifier)
+    (melody_line
+      instrument: (identifier)
+      (chord_name
+        (chord_symbol)
+        (octave)
+        (duration))
+      (chord_name
+        (chord_symbol)
+        (octave)
+        (duration))
+      (chord_name
+        (chord_symbol)
+        (octave)
+        (duration))
+      (chord_name
+        (chord_symbol))
+      (chord_name
+        (chord_symbol))
+      (chord_name
+        (chord_symbol))
+      (chord_name
+        (chord_symbol))
+      (chord_name
+        (chord_symbol)))))
+
+================================================================================
+Instrument and kit note literal with s-sharp alias
+================================================================================
+
+instrument lead {
+  note cs2
+}
+
+kit k {
+  snare {
+    note ds2
+  }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (instrument_def
+    name: (identifier)
+    (instrument_property
+      (note_literal)))
+  (kit_def
+    name: (identifier)
+    (kit_instrument
+      name: (identifier)
+      (kit_instrument_property
+        (note_literal)))))

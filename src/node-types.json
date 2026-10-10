@@ -606,11 +606,6 @@
     }
   },
   {
-    "type": "scale_type",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "scene_def",
     "named": true,
     "fields": {
@@ -1001,10 +996,6 @@
     "named": false
   },
   {
-    "type": "dorian",
-    "named": false
-  },
-  {
     "type": "down",
     "named": false
   },
@@ -1018,10 +1009,6 @@
   },
   {
     "type": "gate_staccato",
-    "named": false
-  },
-  {
-    "type": "harmonic_minor",
     "named": false
   },
   {
@@ -1045,31 +1032,7 @@
     "named": false
   },
   {
-    "type": "locrian",
-    "named": false
-  },
-  {
     "type": "loop",
-    "named": false
-  },
-  {
-    "type": "lydian",
-    "named": false
-  },
-  {
-    "type": "major",
-    "named": false
-  },
-  {
-    "type": "melodic_minor",
-    "named": false
-  },
-  {
-    "type": "minor",
-    "named": false
-  },
-  {
-    "type": "mixolydian",
     "named": false
   },
   {
@@ -1091,10 +1054,6 @@
   {
     "type": "octave",
     "named": true
-  },
-  {
-    "type": "phrygian",
-    "named": false
   },
   {
     "type": "play",
@@ -1131,6 +1090,10 @@
   {
     "type": "scale",
     "named": false
+  },
+  {
+    "type": "scale_type",
+    "named": true
   },
   {
     "type": "scene",

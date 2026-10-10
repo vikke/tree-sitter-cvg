@@ -1,9 +1,37 @@
 /// <reference types="tree-sitter-cli/dsl" />
 
+// 音名 (root) の正規表現ソース。
+// `[a-g]` + 任意の `#`/`b`、または `cs` `ds` `fs` `gs` `as` (s 形式のシャープ。
+// `c#` `d#` `f#` `g#` `a#` の別名)。 `es` / `bs` は別名ではない。
+//
+// Regex source for a note name (root): `[a-g]` with optional `#`/`b`, or the
+// s-sharp aliases `cs` `ds` `fs` `gs` `as` (= `c#` `d#` `f#` `g#` `a#`).
+// `es` / `bs` are NOT aliases.
+const NOTE_NAME_SRC = '(?:[a-g][#b]?|[acdfg]s)';
+
+// スケール種別。 lcvgc 本体の受理集合と完全一致させる。
+// Scale types accepted by lcvgc (exact match only).
+const SCALE_TYPES = [
+  'major', 'minor', 'harmonic_minor', 'melodic_minor',
+  'dorian', 'phrygian', 'lydian', 'mixolydian', 'locrian',
+];
+
 module.exports = grammar({
   name: 'cvg',
 
-  externals: $ => [$.block_comment],
+  // 外部スキャナ (src/scanner.c) で字句解析するトークン。順序は scanner.c の
+  // enum TokenType と一致させること。
+  //   block_comment    : ネスト可能なブロックコメント
+  //   _scale_separator : scale 指定 `<note>_<type>` の `_` (直前に空白不可)。
+  //                      `_` は word (identifier) の部分集合のため内部レキサでは
+  //                      キーワード扱いになり `_major` が identifier に食われる。
+  //                      それを避けるため外部スキャナで 1 文字だけ切り出す。
+  //
+  // Tokens lexed by the external scanner (order must match scanner.c).
+  // `_scale_separator` is the `_` in `<note>_<type>`; it must be lexed
+  // externally because the internal lexer would treat `_` as a keyword of the
+  // word token and swallow `_major` as an identifier.
+  externals: $ => [$.block_comment, $._scale_separator],
 
   extras: $ => [/\s/, $.comment, $.block_comment],
 
@@ -85,8 +113,8 @@ module.exports = grammar({
       seq('gate_staccato', $.number),
     ),
 
-    // note_literal: c2, eb3, f#5 etc (note name + octave number)
-    note_literal: $ => token(seq(/[a-g][#b]?/, /[0-9]/)),
+    // note_literal: c2, eb3, f#5, cs2 etc (note name + octave number)
+    note_literal: $ => token(new RegExp(NOTE_NAME_SRC + '[0-9]')),
 
     // ── clip ──
     clip_def: $ => seq(
@@ -112,14 +140,29 @@ module.exports = grammar({
 
     bars_attr: $ => seq('bars', $.number),
     time_attr: $ => seq('time', $.time_signature),
-    scale_attr: $ => seq('scale', $.note_name, $.scale_type),
+    scale_attr: $ => seq('scale', $._scale_spec),
 
     time_signature: $ => /\d+\/\d+/,
 
-    scale_type: $ => choice(
-      'major', 'minor', 'harmonic_minor', 'melodic_minor',
-      'dorian', 'phrygian', 'lydian', 'mixolydian', 'locrian',
+    // スケール指定: `<note_name>_<scale_type>` の単一トークン表記
+    // (例: `c_major`, `cs_minor`, `c#_minor`, `eb_dorian`)。
+    // `_` (外部スキャナ) と scale_type は直前と空白を挟めない。
+    // 旧形式 `c major` (空白区切り) は構文エラーになる。
+    //
+    // Scale spec written as one word `<note_name>_<scale_type>`.
+    // `_` (external scanner) and the scale type are immediate, so the legacy
+    // whitespace-separated form `c major` is a syntax error.
+    _scale_spec: $ => seq(
+      $.note_name,
+      $._scale_separator,
+      $.scale_type,
     ),
+
+    // scale_type は immediate トークンとして定義する (キーワード化しない)。
+    // `c_harmonic` のような未知の種別は字句段階で失敗する。
+    // Defined as an immediate token (not keywords) so unknown types such as
+    // `c_harmonic` fail at the lexical level.
+    scale_type: $ => token.immediate(choice(...SCALE_TYPES)),
 
     _clip_content: $ => choice(
       $.use_stmt,
@@ -216,11 +259,20 @@ module.exports = grammar({
       optional($.arp_expr),
     ),
 
-    // コードネーム: 音名 (オプショナルな # / b) + サフィックス。
+    // コードネーム: 音名 (オプショナルな # / b、または s 形式シャープ) + サフィックス。
     // lcvgc 仕様 §7.6 の全サフィックスを長い順から並べる (最長一致のため):
     //   M7#5, m7b5, mM7, m13, m11, m9, m7, m6, M7, Maj, sus4, sus2, dim7,
     //   maj7, add9, aug, dim, 13, 11, m, 9, 7, 6
     // (`6` `7` `9` 等の単独数字サフィックスは最後)
+    //
+    // `csus4` の曖昧さ: 単一トークン (DFA) なので `cs` + `us4` という分割は
+    // サフィックス集合に `us4` が無いため成立せず、必ず `c` + `sus4` (C sus4)
+    // と解釈される。 C# sus4 は `cssus4` / `c#sus4`。 `dsus2` `fsus4` `gsus2`
+    // `asus4` も同様に幹音 + sus。 `csm7` は `cs` + `m7` (C#m7)。
+    //
+    // `csus4` ambiguity: because the whole chord symbol is one token, the
+    // split `cs` + `us4` is impossible (`us4` is not a suffix), so `csus4`
+    // is always `c` + `sus4` (C sus4). C# sus4 is `cssus4` / `c#sus4`.
     //
     // Chord symbol token: note name (optional sharp/flat) followed by a
     // chord-quality suffix. Suffixes are listed longest-first to ensure the
@@ -229,7 +281,10 @@ module.exports = grammar({
       token(
         prec(
           2,
-          /[a-g][#b]?(?:M7#5|m7b5|mM7|maj7|sus4|sus2|dim7|add9|m13|m11|M7|Maj|aug|dim|m9|m7|m6|13|11|m|9|7|6)/,
+          new RegExp(
+            NOTE_NAME_SRC +
+              '(?:M7#5|m7b5|mM7|maj7|sus4|sus2|dim7|add9|m13|m11|M7|Maj|aug|dim|m9|m7|m6|13|11|m|9|7|6)',
+          ),
         ),
       ),
 
@@ -320,7 +375,7 @@ module.exports = grammar({
     tempo_stmt: $ => seq('tempo', $.number),
 
     // ── scale (global) ──
-    scale_stmt: $ => seq('scale', $.note_name, $.scale_type),
+    scale_stmt: $ => seq('scale', $._scale_spec),
 
     // ── play / stop ──
     play_stmt: $ => seq(
@@ -336,7 +391,7 @@ module.exports = grammar({
     ),
 
     // ── primitives ──
-    note_name: $ => token(prec(1, /[a-g][#b]?/)),
+    note_name: $ => token(prec(1, new RegExp(NOTE_NAME_SRC))),
     number: $ => /\d+/,
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
     // port_value: port name including spaces, up to newline or '}'

@@ -347,17 +347,8 @@
     "note_literal": {
       "type": "TOKEN",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "PATTERN",
-            "value": "[a-g][#b]?"
-          },
-          {
-            "type": "PATTERN",
-            "value": "[0-9]"
-          }
-        ]
+        "type": "PATTERN",
+        "value": "(?:[a-g][#b]?|[acdfg]s)[0-9]"
       }
     },
     "clip_def": {
@@ -468,11 +459,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "note_name"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "scale_type"
+          "name": "_scale_spec"
         }
       ]
     },
@@ -480,46 +467,66 @@
       "type": "PATTERN",
       "value": "\\d+\\/\\d+"
     },
-    "scale_type": {
-      "type": "CHOICE",
+    "_scale_spec": {
+      "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "major"
+          "type": "SYMBOL",
+          "name": "note_name"
         },
         {
-          "type": "STRING",
-          "value": "minor"
+          "type": "SYMBOL",
+          "name": "_scale_separator"
         },
         {
-          "type": "STRING",
-          "value": "harmonic_minor"
-        },
-        {
-          "type": "STRING",
-          "value": "melodic_minor"
-        },
-        {
-          "type": "STRING",
-          "value": "dorian"
-        },
-        {
-          "type": "STRING",
-          "value": "phrygian"
-        },
-        {
-          "type": "STRING",
-          "value": "lydian"
-        },
-        {
-          "type": "STRING",
-          "value": "mixolydian"
-        },
-        {
-          "type": "STRING",
-          "value": "locrian"
+          "type": "SYMBOL",
+          "name": "scale_type"
         }
       ]
+    },
+    "scale_type": {
+      "type": "IMMEDIATE_TOKEN",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "major"
+          },
+          {
+            "type": "STRING",
+            "value": "minor"
+          },
+          {
+            "type": "STRING",
+            "value": "harmonic_minor"
+          },
+          {
+            "type": "STRING",
+            "value": "melodic_minor"
+          },
+          {
+            "type": "STRING",
+            "value": "dorian"
+          },
+          {
+            "type": "STRING",
+            "value": "phrygian"
+          },
+          {
+            "type": "STRING",
+            "value": "lydian"
+          },
+          {
+            "type": "STRING",
+            "value": "mixolydian"
+          },
+          {
+            "type": "STRING",
+            "value": "locrian"
+          }
+        ]
+      }
     },
     "_clip_content": {
       "type": "CHOICE",
@@ -956,7 +963,7 @@
         "value": 2,
         "content": {
           "type": "PATTERN",
-          "value": "[a-g][#b]?(?:M7#5|m7b5|mM7|maj7|sus4|sus2|dim7|add9|m13|m11|M7|Maj|aug|dim|m9|m7|m6|13|11|m|9|7|6)"
+          "value": "(?:[a-g][#b]?|[acdfg]s)(?:M7#5|m7b5|mM7|maj7|sus4|sus2|dim7|add9|m13|m11|M7|Maj|aug|dim|m9|m7|m6|13|11|m|9|7|6)"
         }
       }
     },
@@ -1317,11 +1324,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "note_name"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "scale_type"
+          "name": "_scale_spec"
         }
       ]
     },
@@ -1390,7 +1393,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "[a-g][#b]?"
+          "value": "(?:[a-g][#b]?|[acdfg]s)"
         }
       }
     },
@@ -1442,6 +1445,10 @@
     {
       "type": "SYMBOL",
       "name": "block_comment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_scale_separator"
     }
   ],
   "inline": [],

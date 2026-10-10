@@ -63,7 +63,7 @@ Block comment between statements
 
 tempo 120
 /* comment between */
-scale c minor
+scale c_minor
 
 --------------------------------------------------------------------------------
 

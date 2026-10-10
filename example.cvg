@@ -14,7 +14,7 @@
 
 tempo 125
 
-scale c minor
+scale c_minor
 
 device my_synth {
   port IAC Driver
@@ -56,7 +56,7 @@ clip drums_a [bars 2] {
   hihat x.x.x.x.x.x.x.x.
 }
 
-clip bass_a [bars 1] [scale c minor] {
+clip bass_a [bars 1] [scale c_minor] {
   bass c:3:8 c:3:8 eb:3:8 f:3:4
 }
 

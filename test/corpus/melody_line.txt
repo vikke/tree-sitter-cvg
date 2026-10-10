@@ -23,7 +23,7 @@ clip bass_a [bars 1] {
 Melody line with notes and rest with duration
 ================================================================================
 
-clip bass_a [bars 1] [scale c minor] {
+clip bass_a [bars 1] [scale c_minor] {
   bass c:3:8 c:3:8 eb:3:8 f:3:4 r:8
 }
 
